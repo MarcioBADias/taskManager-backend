@@ -67,17 +67,13 @@ app.get('/tasks', async (req, res) => {
 
   app.patch('/tasks/reorder', async (req, res) => {
     const { tasks } = req.body
-    const bulkOperations = tasks.map(task => ({
-      updateOne: {
-        filter: { _id: task._id },
-        update: { order: task.order },
-      },
-    }))
     try {
-      await Task.bulkWrite(bulkOperations)
-      res.status(200).send("Order updated successfully")
+      for (let i = 0; i < tasks.length; i++) {
+        await Task.findByIdAndUpdate(tasks[i]._id, { order: i })
+      }
+      res.status(200).json({ message: 'Ordem atualizada com sucesso' })
     } catch (error) {
-      res.status(500).send("Error updating order")
+      res.status(500).json({ message: 'Erro ao atualizar a ordem', error })
     }
   })
   
