@@ -30,7 +30,7 @@ app.get('/tasks', async (req, res) => {
   
       const order = (await Task.countDocuments()) + 1
       const task = new Task({
-        name,
+        name,             
         searchName: nameLower,
         cost,
         deadline,
@@ -44,7 +44,6 @@ app.get('/tasks', async (req, res) => {
         const duplicateKey = error.keyValue.name
         return res.status(400).json({ error: `O item "${duplicateKey}" já está cadastrado na lista.` })
       }
-  
       res.status(400).json({ error: error.message })
     }
   })
