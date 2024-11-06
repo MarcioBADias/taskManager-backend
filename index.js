@@ -20,26 +20,31 @@ app.get('/tasks', async (req, res) => {
   app.post('/tasks', async (req, res) => {
     try {
       const { name, cost, deadline } = req.body
-      const nameLower = name.toLowerCase() 
-      
+      const nameLower = name.toLowerCase()
+  
       const existingTask = await Task.findOne({ searchName: nameLower })
-      
+  
       if (existingTask) {
         return res.status(400).json({ error: `O item "${name}" já está cadastrado na lista.` })
       }
-      
+  
       const order = (await Task.countDocuments()) + 1
       const task = new Task({
-        name, 
+        name,
         searchName: nameLower,
         cost,
         deadline,
         order,
       })
-      
+  
       await task.save()
       res.status(201).json(task)
     } catch (error) {
+      if (error.code === 11000) {
+        const duplicateKey = error.keyValue.name
+        return res.status(400).json({ error: `O item "${duplicateKey}" já está cadastrado na lista.` })
+      }
+  
       res.status(400).json({ error: error.message })
     }
   })
